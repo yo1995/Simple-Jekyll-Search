@@ -5,8 +5,12 @@
     searchInput: null,
     resultsContainer: null,
     json: [],
+    success: Function.prototype,
     searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
-    templateMiddleware: function () {},
+    templateMiddleware: Function.prototype,
+    sortMiddleware: function () {
+      return 0
+    },
     noResultsText: 'No results found',
     limit: 10,
     fuzzy: false,
@@ -23,9 +27,6 @@
   })
   var utils = require('./utils')
 
-  /*
-    Public API
-  */
   window.SimpleJekyllSearch = function (_options) {
     var errors = optionsValidator.validate(_options)
     if (errors.length > 0) {
@@ -41,7 +42,8 @@
 
     repository.setOptions({
       fuzzy: options.fuzzy,
-      limit: options.limit
+      limit: options.limit,
+      sort: options.sortMiddleware
     })
 
     if (utils.isJSON(options.json)) {
@@ -55,19 +57,13 @@
     }
   }
 
-  // For backwards compatibility
-  window.SimpleJekyllSearch.init = window.SimpleJekyllSearch
-
-  if (typeof window.SimpleJekyllSearchInit === 'function') {
-    window.SimpleJekyllSearchInit.call(this, window.SimpleJekyllSearch)
-  }
-
-  function initWithJSON(json) {
+  function initWithJSON (json) {
+    options.success(json)
     repository.put(json)
     registerInput()
   }
 
-  function initWithURL(url) {
+  function initWithURL (url) {
     jsonLoader.load(url, function (err, json) {
       if (err) {
         throwError('failed to get JSON (' + url + ')')
@@ -76,15 +72,15 @@
     })
   }
 
-  function emptyResultsContainer() {
+  function emptyResultsContainer () {
     options.resultsContainer.innerHTML = ''
   }
 
-  function appendToResultsContainer(text) {
+  function appendToResultsContainer (text) {
     options.resultsContainer.innerHTML += text
   }
 
-  function registerInput() {
+  function registerInput () {
     options.searchInput.addEventListener('keyup', function (e) {
       if (isWhitelistedKey(e.which)) {
         emptyResultsContainer()
@@ -93,31 +89,33 @@
     })
   }
 
-  function search(query) {
+  function search (query) {
     if (isValidQuery(query)) {
-      render(repository.search(query))
+      emptyResultsContainer()
+      render(repository.search(query), query)
     }
   }
 
-  function render(results) {
+  function render (results, query) {
     var len = results.length
     if (len === 0) {
       return appendToResultsContainer(options.noResultsText)
     }
     for (var i = 0; i < len; i++) {
+      results[i].query = query
       appendToResultsContainer(templater.compile(results[i]))
     }
   }
 
-  function isValidQuery(query) {
+  function isValidQuery (query) {
     return query && query.length > 0
   }
 
-  function isWhitelistedKey(key) {
+  function isWhitelistedKey (key) {
     return [13, 16, 20, 37, 38, 39, 40, 91].indexOf(key) === -1
   }
 
-  function throwError(message) {
+  function throwError (message) {
     throw new Error('SimpleJekyllSearch --- ' + message)
   }
 })(window)

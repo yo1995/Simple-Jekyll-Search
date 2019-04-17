@@ -5,20 +5,18 @@ module.exports = {
   isJSON: isJSON
 }
 
-function merge(defaultParams, mergeParams) {
+function merge (defaultParams, mergeParams) {
   var mergedOptions = {}
   for (var option in defaultParams) {
-    if (Object.prototype.hasOwnProperty.call(defaultParams, option)) {
-      mergedOptions[option] = defaultParams[option]
-      if (typeof mergeParams[option] !== 'undefined') {
-        mergedOptions[option] = mergeParams[option]
-      }
+    mergedOptions[option] = defaultParams[option]
+    if (typeof mergeParams[option] !== 'undefined') {
+      mergedOptions[option] = mergeParams[option]
     }
   }
   return mergedOptions
 }
 
-function isJSON(json) {
+function isJSON (json) {
   try {
     if (json instanceof Object && JSON.parse(JSON.stringify(json))) {
       return true

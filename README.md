@@ -6,18 +6,17 @@
 
 A JavaScript library to add search functionality to any Jekyll blog.
 
-🚀 Check it out [on my website](https://christianfei.com/posts) and [read this guide](https://christianfei.com/posts/Use-Simple-Jekyll-Search-on-your-blog-in-these-easy-steps/) 📖 to get started!
+🚀 [Read this guide](https://christianfei.com/posts/Use-Simple-Jekyll-Search-on-your-blog-in-these-easy-steps/) 📖 to get started!
 
 ## Use case
 
-You have a blog, built with Jekyll, and want a lightweight search functionality on your blog, purely client-side?
+You have a blog, built with Jekyll, and want a **lightweight search functionality** on your blog, purely client-side?
 
-No server configurations or databases to maintain.
+*No server configurations or databases to maintain*.
 
-Just 5 minutes to have a fully working searchable blog.
+Just **5 minutes** to have a **fully working searchable blog**.
 
 ---
-
 
 ## Installation
 
@@ -27,18 +26,11 @@ Just 5 minutes to have a fully working searchable blog.
 npm install simple-jekyll-search
 ```
 
-### bower
-
-```sh
-bower install --save simple-jekyll-search
-```
-
-
 ## Getting started
 
 ### Create `search.json`
 
-Place the following code in a file called `search.json` in the **root** of your Jekyll blog.
+Place the following code in a file called `search.json` in the **root** of your Jekyll blog. (You can also get a copy [from here](/example/search.json))
 
 This file will be used as a small data source to perform the searches on the client side:
 
@@ -60,7 +52,18 @@ layout: null
 ```
 
 
-### Using the plugin
+## Preparing the plugin
+
+### Add DOM elements
+
+SimpleJekyllSearch needs two `DOM` elements to work:
+
+- a search input field
+- a result container to display the results
+
+#### Give me the code
+
+Here is the code you can use with the default configuration:
 
 You need to place the following code within the layout where you want the search to appear. (See the configuration section below to customize it)
 
@@ -68,133 +71,67 @@ For example in  **_layouts/default.html**:
 
 ```html
 <!-- HTML elements for search -->
-<div id="search-container">
-  <input type="text" id="search-input" placeholder="search...">
-  <ul id="results-container"></ul>
-</div>
+<input type="text" id="search-input" placeholder="Search blog posts..">
+<ul id="results-container"></ul>
 
 <!-- script pointing to jekyll-search.js -->
 <script src="{{ site.baseurl }}/simple-jekyll-search.min.js"></script>
+
+<!-- or -->
+<script src="https://cdn.rawgit.com/christian-fei/Simple-Jekyll-Search/master/dest/simple-jekyll-search.min.js"></script>
 ```
 
 
-## Configuration
+## Usage
 
 Customize SimpleJekyllSearch by passing in your configuration options:
 
 ```js
-SimpleJekyllSearch({
+var sjs = SimpleJekyllSearch({
   searchInput: document.getElementById('search-input'),
   resultsContainer: document.getElementById('results-container'),
   json: '/search.json'
 })
 ```
 
-### searchInput (Element) [required]
+### returns { search }
 
-The input element on which the plugin should listen for keyboard event and trigger the searching and rendering for articles.
+A new instance of SimpleJekyllSearch returns an object, with the only property `search`.
 
+`search` is a function used to simulate a user input and display the matching results. 
 
-### resultsContainer (Element) [required]
+E.g.:
 
-The container element in which the search results should be rendered in. Typically an `<ul>`.
-
-
-### json (String|JSON) [required]
-
-You can either pass in an URL to the `search.json` file, or the results in form of JSON directly, to save one round trip to get the data.
-
-
-### searchResultTemplate (String) [optional]
-
-The template of a single rendered search result.
-
-The templating syntax is very simple: You just enclose the properties you want to replace with curly braces.
-
-E.g.
-
-The template
-
-```html
-<li><a href="{url}">{title}</a></li>
+```
+var sjs = SimpleJekyllSearch({ ...options })
+sjs.search('Hello')
 ```
 
-will render to the following
+💡 it can be used to filter posts by tags or categories!
 
-```html
-<li><a href="/jekyll/update/2014/11/01/welcome-to-jekyll.html">Welcome to Jekyll!</a></li>
-```
+## Options
 
-If the `search.json` contains this data
-
-```json
-[
-    {
-      "title"    : "Welcome to Jekyll!",
-      "category" : "",
-      "tags"     : "",
-      "url"      : "/jekyll/update/2014/11/01/welcome-to-jekyll.html",
-      "date"     : "2014-11-01 21:07:22 +0100"
-    }
-]
-```
-
-
-### templateMiddleware (Function) [optional]
-
-A function that will be called whenever a match in the template is found.
-
-It gets passed the current property name, property value, and the template.
-
-If the function returns a non-undefined value, it gets replaced in the template.
-
-This can be potentially useful for manipulating URLs etc.
-
-Example:
-
-```js
-SimpleJekyllSearch({
-  ...
-  templateMiddleware: function(prop, value, template) {
-    if (prop === 'bar') {
-      return value.replace(/^\//, '')
-    }
-  }
-  ...
-})
-```
-
-See the [tests](tests/Templater.test.js) for an in-depth code example
-
-
-### noResultsText (String) [optional]
-
-The HTML that will be shown if the query didn't match anything.
-
-
-### limit (Number) [optional]
-
-You can limit the number of posts rendered on the page.
-
-
-### fuzzy (Boolean) [optional]
-
-Enable fuzzy search to allow less restrictive matching.
-
-### exclude (Array) [optional]
-
-Pass in a list of terms you want to exclude (terms will be matched against a regex, so urls, words are allowed).
-
+Check out the [wiki](https://github.com/christian-fei/Simple-Jekyll-Search/wiki#options) for the options!
 
 ## Wiki
 
-Check out the [wiki](https://github.com/christian-fei/Simple-Jekyll-Search/wiki)!
+Check out the [wiki](https://github.com/christian-fei/Simple-Jekyll-Search/wiki) for general discussions.
 
 
 ## Development
 
 - `npm install`
 - `npm test`
+
+#### Acceptance tests
+
+```
+cd example; jekyll serve
+
+# in another tab
+
+npm run cypress -- run
+```
 
 ## Contributors
 
